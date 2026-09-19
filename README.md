@@ -1,36 +1,63 @@
 # Advanced Architectures Project
 
-In this project I build a few types of computer networks (used to connect
-many processors together) and show how data moves through them.
+A small Python project about interconnection networks: networks
+used to connect many processors together in a parallel computer.
 
-## What I do
+## What it does
 
-I build these networks:
-- **Baseline / Butterfly network** — a simple network that uses the bits of
-  the destination address to pick the path.
-- **Beneš network** — a network that can connect any input to any output
-  with no clashes, if I route it the right way.
-- **Clos network** — a network built in stages, often used in real
-  data centers.
+Three network types are built and routed:
 
-For each network, I:
-1. Build it (as a graph of switches and connections).
-2. Send data through it and find the path from input to output.
+- **Baseline network** — connects N inputs to N outputs through
+  small 2x2 switches arranged in stages. Routing is done by
+  self-routing: the destination address's bits decide the path.
+- **Benes network** — two Baseline networks mirrored back to back.
+  Any full input-output permutation can be routed with no clashes,
+  using the Looping Algorithm.
+- **Clos network** — a three-stage network (input, middle, output).
+  Any input can reach any output through some middle switch.
+
+For each network, the project can:
+1. Build it as a graph.
+2. Find a path (or a full routing) through it.
 3. Draw a picture of it.
-
-## Why
-
-This is my project for the Advanced Architectures course
-(computer architecture / parallel computing). It shows the
-interconnection network part of the course with real code.
 
 ## Project files
 
-- `networks/` — code that builds each network
-- `routing/` — code that finds the path through each network
-- `tests/` — small checks comparing my code to the numbers from class
+- `networks/` — builds each network (`baseline.py`, `benes.py`, `clos.py`)
+- `routing/` — finds paths through each network
+- `tests/` — checks the routing against the built networks
 - `pictures/` — saved drawings of each network
+- `run_demo.py` — sends some traffic through all three networks
+- `draw_networks.py` — draws and saves the three pictures
+- `REPORT.md` — short write-up of the theory and results
 
 ## How to run it
 
-(coming soon, as each part is finished)
+Install the two libraries needed:
+```
+pip install networkx matplotlib
+```
+
+Build and print a network:
+```
+python3 networks/baseline.py
+python3 -m networks.benes
+python3 -m networks.clos
+```
+
+Run the routing checks:
+```
+python3 -m tests.check_baseline_routing
+python3 -m tests.check_benes_routing
+python3 -m tests.check_clos_routing
+```
+
+Run the traffic demo:
+```
+python3 run_demo.py
+```
+
+Draw the pictures:
+```
+python3 draw_networks.py
+```
