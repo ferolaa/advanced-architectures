@@ -29,6 +29,7 @@ For each network, the project can:
 - `pictures/` — saved drawings of each network
 - `run_demo.py` — sends some traffic through all three networks
 - `draw_networks.py` — draws and saves the three pictures
+- `scaling_analysis.py` — measures and plots how network size grows
 - `REPORT.md` — short write-up of the theory and results
 
 ## How to run it
@@ -60,4 +61,9 @@ python3 run_demo.py
 Draw the pictures:
 ```
 python3 draw_networks.py
+```
+
+Measure and plot how network size grows:
+```
+python3 scaling_analysis.py
 ```

@@ -58,6 +58,19 @@ picked using a simple rule.
 - Pictures of each network were drawn and match the expected shape
   from the theory (see `pictures/`).
 
+## Scaling analysis
+
+The switch and wire counts of each network were measured as the
+number of inputs grows (`scaling_analysis.py`, plots in
+`pictures/scaling_baseline_benes.png` and `pictures/scaling_clos.png`).
+
+The Benes network needs close to double the switches of the
+Baseline network for the same size, which matches the theory: a
+Benes network has 2*log2(N) - 1 stages, almost twice the
+log2(N) stages of a Baseline network. Both grow with N*log(N),
+not N*N, which is what makes these networks efficient for large
+numbers of processors.
+
 ## What was left out
 
 To keep the project simple, blocking analysis (how likely a
