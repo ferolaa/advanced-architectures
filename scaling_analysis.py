@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 from networks.baseline import build_baseline_network
 from networks.benes import build_benes_network
 from networks.clos import build_clos_network
+from networks.xgft import build_xgft_network
 
 
 def measure_baseline_and_benes(sizes):
@@ -66,6 +67,49 @@ def plot_clos_by_m(clos_by_m, filename):
     print(f"saved {filename}")
 
 
+def measure_all_topologies(sizes):
+    """
+    Returns switch counts for all four topologies, for each N in
+    sizes. N must be a power of 4, so it works as both a power of 2
+    (for Baseline/Benes) and a perfect square (for Clos/XGFT).
+
+    Baseline, Benes and XGFT (with w=2) are all non-blocking or
+    close to it by construction. To keep the comparison fair, Clos
+    uses m = 2*side - 1, the proven minimum for non-blocking (see
+    REPORT.md) — not the cheapest possible, blocking, setup.
+    """
+    results = {"baseline": [], "benes": [], "clos": [], "xgft": []}
+    for n in sizes:
+        side = int(round(n ** 0.5))
+
+        baseline_net = build_baseline_network(n)
+        results["baseline"].append(baseline_net.number_of_nodes())
+
+        benes_net = build_benes_network(n)
+        results["benes"].append(benes_net.number_of_nodes())
+
+        clos_net = build_clos_network(r=side, n=side, m=2 * side - 1)
+        results["clos"].append(clos_net.number_of_nodes())
+
+        xgft_net = build_xgft_network(h=2, m=side, w=2)
+        results["xgft"].append(xgft_net.number_of_nodes())
+
+    return results
+
+
+def plot_all_topologies(sizes, results, filename):
+    plt.figure(figsize=(7, 5))
+    for name in ["baseline", "benes", "clos", "xgft"]:
+        plt.plot(sizes, results[name], marker="o", label=name)
+    plt.xlabel("Number of inputs (N)")
+    plt.ylabel("Total switches")
+    plt.title("Switch count vs network size, all topologies")
+    plt.legend()
+    plt.savefig(filename, bbox_inches="tight")
+    plt.close()
+    print(f"saved {filename}")
+
+
 def plot_baseline_and_benes(sizes, results, filename):
     plt.figure(figsize=(7, 5))
     plt.plot(sizes, results["baseline_switches"], marker="o", label="Baseline switches")
@@ -113,3 +157,10 @@ if __name__ == "__main__":
     for m, sw, wi in zip(clos_by_m["m_values"], clos_by_m["switches"], clos_by_m["wires"]):
         print(f"m={m}: switches={sw}, wires={wi}")
     plot_clos_by_m(clos_by_m, "pictures/scaling_clos_by_m.png")
+
+    all_sizes = [4, 16, 64, 256]
+    all_results = measure_all_topologies(all_sizes)
+    for i, n in enumerate(all_sizes):
+        print(f"N={n}: baseline={all_results['baseline'][i]}, benes={all_results['benes'][i]}, "
+              f"clos={all_results['clos'][i]}, xgft={all_results['xgft'][i]}")
+    plot_all_topologies(all_sizes, all_results, "pictures/scaling_all_topologies.png")

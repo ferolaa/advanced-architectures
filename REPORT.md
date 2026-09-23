@@ -80,6 +80,23 @@ switch added connects to all r input and all r output switches.
 This is the cost/redundancy trade-off behind Clos's non-blocking
 condition (m >= 2n - 1).
 
+## Comparing all four topologies
+
+Switch counts for all four networks were plotted together
+(`pictures/scaling_all_topologies.png`), all set up to be
+non-blocking so the comparison is fair: Baseline, Benes and XGFT
+(with redundancy w=2) are non-blocking (or close to it) by
+construction, and Clos uses m = 2n - 1, the proven non-blocking
+minimum.
+
+Clos comes out with the fewest switches in this comparison. This
+is because its r and n were both set to roughly sqrt(N), so its
+switch count grows with sqrt(N) rather than N or N*log(N) like the
+other three. This is a property of the chosen r/n split, not a
+general rule for every Clos network — but it does show why Clos
+networks are popular in real data centers, where the number of
+switches (and their cost) matters a lot.
+
 ## What was left out
 
 To keep the project simple, blocking analysis (how likely a
