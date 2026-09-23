@@ -193,6 +193,24 @@
     margin-top: 6px;
   }
   .blocking-count.has-blocks { color: #ff8080; }
+
+  .butterfly-line {
+    fill: none;
+    stroke-width: 2;
+    opacity: 0.55;
+  }
+  .butterfly-dot {
+    filter: drop-shadow(0 0 4px currentColor);
+  }
+  .butterfly-vertex {
+    fill: var(--panel);
+    stroke: var(--panel-border);
+    stroke-width: 1.5;
+  }
+  .butterfly-label {
+    fill: var(--muted);
+    font-size: 10px;
+  }
 </style>
 </head>
 <body>
@@ -215,6 +233,16 @@
     <div class="caption" id="caption"></div>
   </div>
 
+
+
+  <h2 class="section-title">Benes: the whole permutation, live</h2>
+  <div class="panel">
+    <p class="caption" style="margin-top:0;">All 8 connections moving together. Colors show which pair ends up sharing a switch.</p>
+    <div class="controls">
+      <button id="benesPlayBtn">Play</button>
+    </div>
+    <svg id="svgBenesPerm" viewBox="0 0 800 380" preserveAspectRatio="xMidYMid meet"></svg>
+  </div>
 
   <h2 class="section-title">Clos blocking, live</h2>
   <div class="panel">
@@ -252,6 +280,7 @@
 const DATA = {"baseline": {"nodes": [{"name": "s0_0", "x": 0, "y": 0}, {"name": "s0_1", "x": 0, "y": 1}, {"name": "s0_2", "x": 0, "y": 2}, {"name": "s0_3", "x": 0, "y": 3}, {"name": "s1_0", "x": 1, "y": 0}, {"name": "s1_1", "x": 1, "y": 1}, {"name": "s1_2", "x": 1, "y": 2}, {"name": "s1_3", "x": 1, "y": 3}, {"name": "s2_0", "x": 2, "y": 0}, {"name": "s2_1", "x": 2, "y": 1}, {"name": "s2_2", "x": 2, "y": 2}, {"name": "s2_3", "x": 2, "y": 3}], "edges": [{"from": "s0_0", "to": "s1_0"}, {"from": "s0_0", "to": "s1_2"}, {"from": "s0_1", "to": "s1_1"}, {"from": "s0_1", "to": "s1_3"}, {"from": "s0_2", "to": "s1_2"}, {"from": "s0_2", "to": "s1_0"}, {"from": "s0_3", "to": "s1_3"}, {"from": "s0_3", "to": "s1_1"}, {"from": "s1_0", "to": "s2_0"}, {"from": "s1_0", "to": "s2_1"}, {"from": "s1_1", "to": "s2_1"}, {"from": "s1_1", "to": "s2_0"}, {"from": "s1_2", "to": "s2_2"}, {"from": "s1_2", "to": "s2_3"}, {"from": "s1_3", "to": "s2_3"}, {"from": "s1_3", "to": "s2_2"}], "paths": {"0->0": ["s0_0", "s1_0", "s2_0"], "0->1": ["s0_0", "s1_0", "s2_1"], "0->2": ["s0_0", "s1_2", "s2_2"], "0->3": ["s0_0", "s1_2", "s2_3"], "0->4": ["s0_0", "s1_0", "s2_0"], "0->5": ["s0_0", "s1_0", "s2_1"], "0->6": ["s0_0", "s1_2", "s2_2"], "0->7": ["s0_0", "s1_2", "s2_3"], "1->0": ["s0_0", "s1_0", "s2_0"], "1->1": ["s0_0", "s1_0", "s2_1"], "1->2": ["s0_0", "s1_2", "s2_2"], "1->3": ["s0_0", "s1_2", "s2_3"], "1->4": ["s0_0", "s1_0", "s2_0"], "1->5": ["s0_0", "s1_0", "s2_1"], "1->6": ["s0_0", "s1_2", "s2_2"], "1->7": ["s0_0", "s1_2", "s2_3"], "2->0": ["s0_1", "s1_1", "s2_0"], "2->1": ["s0_1", "s1_1", "s2_1"], "2->2": ["s0_1", "s1_3", "s2_2"], "2->3": ["s0_1", "s1_3", "s2_3"], "2->4": ["s0_1", "s1_1", "s2_0"], "2->5": ["s0_1", "s1_1", "s2_1"], "2->6": ["s0_1", "s1_3", "s2_2"], "2->7": ["s0_1", "s1_3", "s2_3"], "3->0": ["s0_1", "s1_1", "s2_0"], "3->1": ["s0_1", "s1_1", "s2_1"], "3->2": ["s0_1", "s1_3", "s2_2"], "3->3": ["s0_1", "s1_3", "s2_3"], "3->4": ["s0_1", "s1_1", "s2_0"], "3->5": ["s0_1", "s1_1", "s2_1"], "3->6": ["s0_1", "s1_3", "s2_2"], "3->7": ["s0_1", "s1_3", "s2_3"], "4->0": ["s0_2", "s1_0", "s2_0"], "4->1": ["s0_2", "s1_0", "s2_1"], "4->2": ["s0_2", "s1_2", "s2_2"], "4->3": ["s0_2", "s1_2", "s2_3"], "4->4": ["s0_2", "s1_0", "s2_0"], "4->5": ["s0_2", "s1_0", "s2_1"], "4->6": ["s0_2", "s1_2", "s2_2"], "4->7": ["s0_2", "s1_2", "s2_3"], "5->0": ["s0_2", "s1_0", "s2_0"], "5->1": ["s0_2", "s1_0", "s2_1"], "5->2": ["s0_2", "s1_2", "s2_2"], "5->3": ["s0_2", "s1_2", "s2_3"], "5->4": ["s0_2", "s1_0", "s2_0"], "5->5": ["s0_2", "s1_0", "s2_1"], "5->6": ["s0_2", "s1_2", "s2_2"], "5->7": ["s0_2", "s1_2", "s2_3"], "6->0": ["s0_3", "s1_1", "s2_0"], "6->1": ["s0_3", "s1_1", "s2_1"], "6->2": ["s0_3", "s1_3", "s2_2"], "6->3": ["s0_3", "s1_3", "s2_3"], "6->4": ["s0_3", "s1_1", "s2_0"], "6->5": ["s0_3", "s1_1", "s2_1"], "6->6": ["s0_3", "s1_3", "s2_2"], "6->7": ["s0_3", "s1_3", "s2_3"], "7->0": ["s0_3", "s1_1", "s2_0"], "7->1": ["s0_3", "s1_1", "s2_1"], "7->2": ["s0_3", "s1_3", "s2_2"], "7->3": ["s0_3", "s1_3", "s2_3"], "7->4": ["s0_3", "s1_1", "s2_0"], "7->5": ["s0_3", "s1_1", "s2_1"], "7->6": ["s0_3", "s1_3", "s2_2"], "7->7": ["s0_3", "s1_3", "s2_3"]}, "labels": {"0": "in 0", "1": "in 1", "2": "in 2", "3": "in 3", "4": "in 4", "5": "in 5", "6": "in 6", "7": "in 7"}}, "benes": {"nodes": [{"name": "s0_0", "x": 0, "y": 0}, {"name": "s0_1", "x": 0, "y": 1}, {"name": "s0_2", "x": 0, "y": 2}, {"name": "s0_3", "x": 0, "y": 3}, {"name": "s1_0", "x": 1, "y": 0}, {"name": "s1_1", "x": 1, "y": 1}, {"name": "s1_2", "x": 1, "y": 2}, {"name": "s1_3", "x": 1, "y": 3}, {"name": "s2_0", "x": 2, "y": 0}, {"name": "s2_1", "x": 2, "y": 1}, {"name": "s2_2", "x": 2, "y": 2}, {"name": "s2_3", "x": 2, "y": 3}, {"name": "s3_0", "x": 3, "y": 0}, {"name": "s3_1", "x": 3, "y": 1}, {"name": "s3_2", "x": 3, "y": 2}, {"name": "s3_3", "x": 3, "y": 3}, {"name": "s4_0", "x": 4, "y": 0}, {"name": "s4_1", "x": 4, "y": 1}, {"name": "s4_2", "x": 4, "y": 2}, {"name": "s4_3", "x": 4, "y": 3}], "edges": [{"from": "s0_0", "to": "s1_0"}, {"from": "s0_0", "to": "s1_2"}, {"from": "s0_1", "to": "s1_1"}, {"from": "s0_1", "to": "s1_3"}, {"from": "s0_2", "to": "s1_2"}, {"from": "s0_2", "to": "s1_0"}, {"from": "s0_3", "to": "s1_3"}, {"from": "s0_3", "to": "s1_1"}, {"from": "s1_0", "to": "s2_0"}, {"from": "s1_0", "to": "s2_1"}, {"from": "s1_1", "to": "s2_1"}, {"from": "s1_1", "to": "s2_0"}, {"from": "s1_2", "to": "s2_2"}, {"from": "s1_2", "to": "s2_3"}, {"from": "s1_3", "to": "s2_3"}, {"from": "s1_3", "to": "s2_2"}, {"from": "s2_0", "to": "s3_0"}, {"from": "s2_0", "to": "s3_1"}, {"from": "s2_1", "to": "s3_1"}, {"from": "s2_1", "to": "s3_0"}, {"from": "s2_2", "to": "s3_2"}, {"from": "s2_2", "to": "s3_3"}, {"from": "s2_3", "to": "s3_3"}, {"from": "s2_3", "to": "s3_2"}, {"from": "s3_0", "to": "s4_0"}, {"from": "s3_0", "to": "s4_2"}, {"from": "s3_1", "to": "s4_1"}, {"from": "s3_1", "to": "s4_3"}, {"from": "s3_2", "to": "s4_2"}, {"from": "s3_2", "to": "s4_0"}, {"from": "s3_3", "to": "s4_3"}, {"from": "s3_3", "to": "s4_1"}], "paths": {"0->0": ["s0_0", "s1_0", "s2_0", "s3_0", "s4_0"], "0->1": ["s0_0", "s1_0", "s2_0", "s3_0", "s4_0"], "0->2": ["s0_0", "s1_0", "s2_0", "s3_1", "s4_1"], "0->3": ["s0_0", "s1_0", "s2_0", "s3_1", "s4_1"], "0->4": ["s0_0", "s1_0", "s2_0", "s3_0", "s4_2"], "0->5": ["s0_0", "s1_0", "s2_0", "s3_0", "s4_2"], "0->6": ["s0_0", "s1_0", "s2_0", "s3_1", "s4_3"], "0->7": ["s0_0", "s1_0", "s2_0", "s3_1", "s4_3"], "1->0": ["s0_0", "s1_0", "s2_0", "s3_0", "s4_0"], "1->1": ["s0_0", "s1_0", "s2_0", "s3_0", "s4_0"], "1->2": ["s0_0", "s1_0", "s2_0", "s3_1", "s4_1"], "1->3": ["s0_0", "s1_0", "s2_0", "s3_1", "s4_1"], "1->4": ["s0_0", "s1_0", "s2_0", "s3_0", "s4_2"], "1->5": ["s0_0", "s1_0", "s2_0", "s3_0", "s4_2"], "1->6": ["s0_0", "s1_0", "s2_0", "s3_1", "s4_3"], "1->7": ["s0_0", "s1_0", "s2_0", "s3_1", "s4_3"], "2->0": ["s0_1", "s1_1", "s2_0", "s3_0", "s4_0"], "2->1": ["s0_1", "s1_1", "s2_0", "s3_0", "s4_0"], "2->2": ["s0_1", "s1_1", "s2_0", "s3_1", "s4_1"], "2->3": ["s0_1", "s1_1", "s2_0", "s3_1", "s4_1"], "2->4": ["s0_1", "s1_1", "s2_0", "s3_0", "s4_2"], "2->5": ["s0_1", "s1_1", "s2_0", "s3_0", "s4_2"], "2->6": ["s0_1", "s1_1", "s2_0", "s3_1", "s4_3"], "2->7": ["s0_1", "s1_1", "s2_0", "s3_1", "s4_3"], "3->0": ["s0_1", "s1_1", "s2_0", "s3_0", "s4_0"], "3->1": ["s0_1", "s1_1", "s2_0", "s3_0", "s4_0"], "3->2": ["s0_1", "s1_1", "s2_0", "s3_1", "s4_1"], "3->3": ["s0_1", "s1_1", "s2_0", "s3_1", "s4_1"], "3->4": ["s0_1", "s1_1", "s2_0", "s3_0", "s4_2"], "3->5": ["s0_1", "s1_1", "s2_0", "s3_0", "s4_2"], "3->6": ["s0_1", "s1_1", "s2_0", "s3_1", "s4_3"], "3->7": ["s0_1", "s1_1", "s2_0", "s3_1", "s4_3"], "4->0": ["s0_2", "s1_0", "s2_0", "s3_0", "s4_0"], "4->1": ["s0_2", "s1_0", "s2_0", "s3_0", "s4_0"], "4->2": ["s0_2", "s1_0", "s2_0", "s3_1", "s4_1"], "4->3": ["s0_2", "s1_0", "s2_0", "s3_1", "s4_1"], "4->4": ["s0_2", "s1_0", "s2_0", "s3_0", "s4_2"], "4->5": ["s0_2", "s1_0", "s2_0", "s3_0", "s4_2"], "4->6": ["s0_2", "s1_0", "s2_0", "s3_1", "s4_3"], "4->7": ["s0_2", "s1_0", "s2_0", "s3_1", "s4_3"], "5->0": ["s0_2", "s1_0", "s2_0", "s3_0", "s4_0"], "5->1": ["s0_2", "s1_0", "s2_0", "s3_0", "s4_0"], "5->2": ["s0_2", "s1_0", "s2_0", "s3_1", "s4_1"], "5->3": ["s0_2", "s1_0", "s2_0", "s3_1", "s4_1"], "5->4": ["s0_2", "s1_0", "s2_0", "s3_0", "s4_2"], "5->5": ["s0_2", "s1_0", "s2_0", "s3_0", "s4_2"], "5->6": ["s0_2", "s1_0", "s2_0", "s3_1", "s4_3"], "5->7": ["s0_2", "s1_0", "s2_0", "s3_1", "s4_3"], "6->0": ["s0_3", "s1_1", "s2_0", "s3_0", "s4_0"], "6->1": ["s0_3", "s1_1", "s2_0", "s3_0", "s4_0"], "6->2": ["s0_3", "s1_1", "s2_0", "s3_1", "s4_1"], "6->3": ["s0_3", "s1_1", "s2_0", "s3_1", "s4_1"], "6->4": ["s0_3", "s1_1", "s2_0", "s3_0", "s4_2"], "6->5": ["s0_3", "s1_1", "s2_0", "s3_0", "s4_2"], "6->6": ["s0_3", "s1_1", "s2_0", "s3_1", "s4_3"], "6->7": ["s0_3", "s1_1", "s2_0", "s3_1", "s4_3"], "7->0": ["s0_3", "s1_1", "s2_0", "s3_0", "s4_0"], "7->1": ["s0_3", "s1_1", "s2_0", "s3_0", "s4_0"], "7->2": ["s0_3", "s1_1", "s2_0", "s3_1", "s4_1"], "7->3": ["s0_3", "s1_1", "s2_0", "s3_1", "s4_1"], "7->4": ["s0_3", "s1_1", "s2_0", "s3_0", "s4_2"], "7->5": ["s0_3", "s1_1", "s2_0", "s3_0", "s4_2"], "7->6": ["s0_3", "s1_1", "s2_0", "s3_1", "s4_3"], "7->7": ["s0_3", "s1_1", "s2_0", "s3_1", "s4_3"]}, "labels": {"0": "in 0", "1": "in 1", "2": "in 2", "3": "in 3", "4": "in 4", "5": "in 5", "6": "in 6", "7": "in 7"}}, "clos": {"nodes": [{"name": "in_0", "x": 0, "y": 0}, {"name": "in_1", "x": 0, "y": 1}, {"name": "in_2", "x": 0, "y": 2}, {"name": "in_3", "x": 0, "y": 3}, {"name": "mid_0", "x": 1, "y": 0}, {"name": "mid_1", "x": 1, "y": 1}, {"name": "mid_2", "x": 1, "y": 2}, {"name": "mid_3", "x": 1, "y": 3}, {"name": "mid_4", "x": 1, "y": 4}, {"name": "out_0", "x": 2, "y": 0}, {"name": "out_1", "x": 2, "y": 1}, {"name": "out_2", "x": 2, "y": 2}, {"name": "out_3", "x": 2, "y": 3}], "edges": [{"from": "in_0", "to": "mid_0"}, {"from": "in_0", "to": "mid_1"}, {"from": "in_0", "to": "mid_2"}, {"from": "in_0", "to": "mid_3"}, {"from": "in_0", "to": "mid_4"}, {"from": "in_1", "to": "mid_0"}, {"from": "in_1", "to": "mid_1"}, {"from": "in_1", "to": "mid_2"}, {"from": "in_1", "to": "mid_3"}, {"from": "in_1", "to": "mid_4"}, {"from": "in_2", "to": "mid_0"}, {"from": "in_2", "to": "mid_1"}, {"from": "in_2", "to": "mid_2"}, {"from": "in_2", "to": "mid_3"}, {"from": "in_2", "to": "mid_4"}, {"from": "in_3", "to": "mid_0"}, {"from": "in_3", "to": "mid_1"}, {"from": "in_3", "to": "mid_2"}, {"from": "in_3", "to": "mid_3"}, {"from": "in_3", "to": "mid_4"}, {"from": "mid_0", "to": "out_0"}, {"from": "mid_0", "to": "out_1"}, {"from": "mid_0", "to": "out_2"}, {"from": "mid_0", "to": "out_3"}, {"from": "mid_1", "to": "out_0"}, {"from": "mid_1", "to": "out_1"}, {"from": "mid_1", "to": "out_2"}, {"from": "mid_1", "to": "out_3"}, {"from": "mid_2", "to": "out_0"}, {"from": "mid_2", "to": "out_1"}, {"from": "mid_2", "to": "out_2"}, {"from": "mid_2", "to": "out_3"}, {"from": "mid_3", "to": "out_0"}, {"from": "mid_3", "to": "out_1"}, {"from": "mid_3", "to": "out_2"}, {"from": "mid_3", "to": "out_3"}, {"from": "mid_4", "to": "out_0"}, {"from": "mid_4", "to": "out_1"}, {"from": "mid_4", "to": "out_2"}, {"from": "mid_4", "to": "out_3"}], "paths": {"0->0": ["in_0", "mid_0", "out_0"], "0->1": ["in_0", "mid_0", "out_0"], "0->2": ["in_0", "mid_0", "out_0"], "0->3": ["in_0", "mid_1", "out_1"], "0->4": ["in_0", "mid_1", "out_1"], "0->5": ["in_0", "mid_1", "out_1"], "0->6": ["in_0", "mid_2", "out_2"], "0->7": ["in_0", "mid_2", "out_2"], "0->8": ["in_0", "mid_2", "out_2"], "0->9": ["in_0", "mid_3", "out_3"], "0->10": ["in_0", "mid_3", "out_3"], "0->11": ["in_0", "mid_3", "out_3"], "1->0": ["in_0", "mid_0", "out_0"], "1->1": ["in_0", "mid_0", "out_0"], "1->2": ["in_0", "mid_0", "out_0"], "1->3": ["in_0", "mid_1", "out_1"], "1->4": ["in_0", "mid_1", "out_1"], "1->5": ["in_0", "mid_1", "out_1"], "1->6": ["in_0", "mid_2", "out_2"], "1->7": ["in_0", "mid_2", "out_2"], "1->8": ["in_0", "mid_2", "out_2"], "1->9": ["in_0", "mid_3", "out_3"], "1->10": ["in_0", "mid_3", "out_3"], "1->11": ["in_0", "mid_3", "out_3"], "2->0": ["in_0", "mid_0", "out_0"], "2->1": ["in_0", "mid_0", "out_0"], "2->2": ["in_0", "mid_0", "out_0"], "2->3": ["in_0", "mid_1", "out_1"], "2->4": ["in_0", "mid_1", "out_1"], "2->5": ["in_0", "mid_1", "out_1"], "2->6": ["in_0", "mid_2", "out_2"], "2->7": ["in_0", "mid_2", "out_2"], "2->8": ["in_0", "mid_2", "out_2"], "2->9": ["in_0", "mid_3", "out_3"], "2->10": ["in_0", "mid_3", "out_3"], "2->11": ["in_0", "mid_3", "out_3"], "3->0": ["in_1", "mid_1", "out_0"], "3->1": ["in_1", "mid_1", "out_0"], "3->2": ["in_1", "mid_1", "out_0"], "3->3": ["in_1", "mid_2", "out_1"], "3->4": ["in_1", "mid_2", "out_1"], "3->5": ["in_1", "mid_2", "out_1"], "3->6": ["in_1", "mid_3", "out_2"], "3->7": ["in_1", "mid_3", "out_2"], "3->8": ["in_1", "mid_3", "out_2"], "3->9": ["in_1", "mid_4", "out_3"], "3->10": ["in_1", "mid_4", "out_3"], "3->11": ["in_1", "mid_4", "out_3"], "4->0": ["in_1", "mid_1", "out_0"], "4->1": ["in_1", "mid_1", "out_0"], "4->2": ["in_1", "mid_1", "out_0"], "4->3": ["in_1", "mid_2", "out_1"], "4->4": ["in_1", "mid_2", "out_1"], "4->5": ["in_1", "mid_2", "out_1"], "4->6": ["in_1", "mid_3", "out_2"], "4->7": ["in_1", "mid_3", "out_2"], "4->8": ["in_1", "mid_3", "out_2"], "4->9": ["in_1", "mid_4", "out_3"], "4->10": ["in_1", "mid_4", "out_3"], "4->11": ["in_1", "mid_4", "out_3"], "5->0": ["in_1", "mid_1", "out_0"], "5->1": ["in_1", "mid_1", "out_0"], "5->2": ["in_1", "mid_1", "out_0"], "5->3": ["in_1", "mid_2", "out_1"], "5->4": ["in_1", "mid_2", "out_1"], "5->5": ["in_1", "mid_2", "out_1"], "5->6": ["in_1", "mid_3", "out_2"], "5->7": ["in_1", "mid_3", "out_2"], "5->8": ["in_1", "mid_3", "out_2"], "5->9": ["in_1", "mid_4", "out_3"], "5->10": ["in_1", "mid_4", "out_3"], "5->11": ["in_1", "mid_4", "out_3"], "6->0": ["in_2", "mid_2", "out_0"], "6->1": ["in_2", "mid_2", "out_0"], "6->2": ["in_2", "mid_2", "out_0"], "6->3": ["in_2", "mid_3", "out_1"], "6->4": ["in_2", "mid_3", "out_1"], "6->5": ["in_2", "mid_3", "out_1"], "6->6": ["in_2", "mid_4", "out_2"], "6->7": ["in_2", "mid_4", "out_2"], "6->8": ["in_2", "mid_4", "out_2"], "6->9": ["in_2", "mid_0", "out_3"], "6->10": ["in_2", "mid_0", "out_3"], "6->11": ["in_2", "mid_0", "out_3"], "7->0": ["in_2", "mid_2", "out_0"], "7->1": ["in_2", "mid_2", "out_0"], "7->2": ["in_2", "mid_2", "out_0"], "7->3": ["in_2", "mid_3", "out_1"], "7->4": ["in_2", "mid_3", "out_1"], "7->5": ["in_2", "mid_3", "out_1"], "7->6": ["in_2", "mid_4", "out_2"], "7->7": ["in_2", "mid_4", "out_2"], "7->8": ["in_2", "mid_4", "out_2"], "7->9": ["in_2", "mid_0", "out_3"], "7->10": ["in_2", "mid_0", "out_3"], "7->11": ["in_2", "mid_0", "out_3"], "8->0": ["in_2", "mid_2", "out_0"], "8->1": ["in_2", "mid_2", "out_0"], "8->2": ["in_2", "mid_2", "out_0"], "8->3": ["in_2", "mid_3", "out_1"], "8->4": ["in_2", "mid_3", "out_1"], "8->5": ["in_2", "mid_3", "out_1"], "8->6": ["in_2", "mid_4", "out_2"], "8->7": ["in_2", "mid_4", "out_2"], "8->8": ["in_2", "mid_4", "out_2"], "8->9": ["in_2", "mid_0", "out_3"], "8->10": ["in_2", "mid_0", "out_3"], "8->11": ["in_2", "mid_0", "out_3"], "9->0": ["in_3", "mid_3", "out_0"], "9->1": ["in_3", "mid_3", "out_0"], "9->2": ["in_3", "mid_3", "out_0"], "9->3": ["in_3", "mid_4", "out_1"], "9->4": ["in_3", "mid_4", "out_1"], "9->5": ["in_3", "mid_4", "out_1"], "9->6": ["in_3", "mid_0", "out_2"], "9->7": ["in_3", "mid_0", "out_2"], "9->8": ["in_3", "mid_0", "out_2"], "9->9": ["in_3", "mid_1", "out_3"], "9->10": ["in_3", "mid_1", "out_3"], "9->11": ["in_3", "mid_1", "out_3"], "10->0": ["in_3", "mid_3", "out_0"], "10->1": ["in_3", "mid_3", "out_0"], "10->2": ["in_3", "mid_3", "out_0"], "10->3": ["in_3", "mid_4", "out_1"], "10->4": ["in_3", "mid_4", "out_1"], "10->5": ["in_3", "mid_4", "out_1"], "10->6": ["in_3", "mid_0", "out_2"], "10->7": ["in_3", "mid_0", "out_2"], "10->8": ["in_3", "mid_0", "out_2"], "10->9": ["in_3", "mid_1", "out_3"], "10->10": ["in_3", "mid_1", "out_3"], "10->11": ["in_3", "mid_1", "out_3"], "11->0": ["in_3", "mid_3", "out_0"], "11->1": ["in_3", "mid_3", "out_0"], "11->2": ["in_3", "mid_3", "out_0"], "11->3": ["in_3", "mid_4", "out_1"], "11->4": ["in_3", "mid_4", "out_1"], "11->5": ["in_3", "mid_4", "out_1"], "11->6": ["in_3", "mid_0", "out_2"], "11->7": ["in_3", "mid_0", "out_2"], "11->8": ["in_3", "mid_0", "out_2"], "11->9": ["in_3", "mid_1", "out_3"], "11->10": ["in_3", "mid_1", "out_3"], "11->11": ["in_3", "mid_1", "out_3"]}, "labels": {"0": "in 0", "1": "in 1", "2": "in 2", "3": "in 3", "4": "in 4", "5": "in 5", "6": "in 6", "7": "in 7", "8": "in 8", "9": "in 9", "10": "in 10", "11": "in 11"}}, "xgft": {"nodes": [{"name": "leaf_0", "x": 0, "y": 0}, {"name": "leaf_1", "x": 0, "y": 1}, {"name": "leaf_2", "x": 0, "y": 2}, {"name": "leaf_3", "x": 0, "y": 3}, {"name": "L1_0_0", "x": 1, "y": 0}, {"name": "L1_0_1", "x": 1, "y": 1}, {"name": "L1_1_0", "x": 1, "y": 2}, {"name": "L1_1_1", "x": 1, "y": 3}, {"name": "L2_0_0", "x": 2, "y": 0}, {"name": "L2_0_1", "x": 2, "y": 1}, {"name": "L2_0_2", "x": 2, "y": 2}, {"name": "L2_0_3", "x": 2, "y": 3}], "edges": [{"from": "leaf_0", "to": "L1_0_0"}, {"from": "leaf_0", "to": "L1_0_1"}, {"from": "leaf_1", "to": "L1_0_0"}, {"from": "leaf_1", "to": "L1_0_1"}, {"from": "leaf_2", "to": "L1_1_0"}, {"from": "leaf_2", "to": "L1_1_1"}, {"from": "leaf_3", "to": "L1_1_0"}, {"from": "leaf_3", "to": "L1_1_1"}, {"from": "L1_0_0", "to": "L2_0_0"}, {"from": "L1_0_0", "to": "L2_0_1"}, {"from": "L1_0_0", "to": "L2_0_2"}, {"from": "L1_0_0", "to": "L2_0_3"}, {"from": "L1_0_1", "to": "L2_0_0"}, {"from": "L1_0_1", "to": "L2_0_1"}, {"from": "L1_0_1", "to": "L2_0_2"}, {"from": "L1_0_1", "to": "L2_0_3"}, {"from": "L1_1_0", "to": "L2_0_0"}, {"from": "L1_1_0", "to": "L2_0_1"}, {"from": "L1_1_0", "to": "L2_0_2"}, {"from": "L1_1_0", "to": "L2_0_3"}, {"from": "L1_1_1", "to": "L2_0_0"}, {"from": "L1_1_1", "to": "L2_0_1"}, {"from": "L1_1_1", "to": "L2_0_2"}, {"from": "L1_1_1", "to": "L2_0_3"}], "paths": {"0->1": ["leaf_0", "L1_0_0", "leaf_1"], "0->2": ["leaf_0", "L1_0_0", "L2_0_0", "L1_1_0", "leaf_2"], "0->3": ["leaf_0", "L1_0_0", "L2_0_0", "L1_1_0", "leaf_3"], "1->0": ["leaf_1", "L1_0_0", "leaf_0"], "1->2": ["leaf_1", "L1_0_0", "L2_0_0", "L1_1_0", "leaf_2"], "1->3": ["leaf_1", "L1_0_0", "L2_0_0", "L1_1_0", "leaf_3"], "2->0": ["leaf_2", "L1_1_0", "L2_0_0", "L1_0_0", "leaf_0"], "2->1": ["leaf_2", "L1_1_0", "L2_0_0", "L1_0_0", "leaf_1"], "2->3": ["leaf_2", "L1_1_0", "leaf_3"], "3->0": ["leaf_3", "L1_1_0", "L2_0_0", "L1_0_0", "leaf_0"], "3->1": ["leaf_3", "L1_1_0", "L2_0_0", "L1_0_0", "leaf_1"], "3->2": ["leaf_3", "L1_1_0", "leaf_2"]}, "labels": {"0": "leaf 0", "1": "leaf 1", "2": "leaf 2", "3": "leaf 3"}}};
 const BLOCKING_DATA = {"r": 4, "n": 3, "small": {"m": 2, "nodes": [{"name": "in_0", "x": 0, "y": 0}, {"name": "in_1", "x": 0, "y": 1}, {"name": "in_2", "x": 0, "y": 2}, {"name": "in_3", "x": 0, "y": 3}, {"name": "mid_0", "x": 1, "y": 0}, {"name": "mid_1", "x": 1, "y": 1}, {"name": "out_0", "x": 2, "y": 0}, {"name": "out_1", "x": 2, "y": 1}, {"name": "out_2", "x": 2, "y": 2}, {"name": "out_3", "x": 2, "y": 3}], "edges": [{"from": "in_0", "to": "mid_0"}, {"from": "in_0", "to": "mid_1"}, {"from": "in_1", "to": "mid_0"}, {"from": "in_1", "to": "mid_1"}, {"from": "in_2", "to": "mid_0"}, {"from": "in_2", "to": "mid_1"}, {"from": "in_3", "to": "mid_0"}, {"from": "in_3", "to": "mid_1"}, {"from": "mid_0", "to": "out_0"}, {"from": "mid_0", "to": "out_1"}, {"from": "mid_0", "to": "out_2"}, {"from": "mid_0", "to": "out_3"}, {"from": "mid_1", "to": "out_0"}, {"from": "mid_1", "to": "out_1"}, {"from": "mid_1", "to": "out_2"}, {"from": "mid_1", "to": "out_3"}], "steps": [{"source": 0, "destination": 1, "in_switch": 0, "out_switch": 0, "middle": 0}, {"source": 1, "destination": 9, "in_switch": 0, "out_switch": 3, "middle": 1}, {"source": 2, "destination": 8, "in_switch": 0, "out_switch": 2, "middle": null}, {"source": 3, "destination": 5, "in_switch": 1, "out_switch": 1, "middle": 0}, {"source": 4, "destination": 10, "in_switch": 1, "out_switch": 3, "middle": null}, {"source": 5, "destination": 2, "in_switch": 1, "out_switch": 0, "middle": 1}, {"source": 6, "destination": 3, "in_switch": 2, "out_switch": 1, "middle": 1}, {"source": 7, "destination": 7, "in_switch": 2, "out_switch": 2, "middle": 0}, {"source": 8, "destination": 4, "in_switch": 2, "out_switch": 1, "middle": null}, {"source": 9, "destination": 0, "in_switch": 3, "out_switch": 0, "middle": null}, {"source": 10, "destination": 11, "in_switch": 3, "out_switch": 3, "middle": 0}, {"source": 11, "destination": 6, "in_switch": 3, "out_switch": 2, "middle": 1}]}, "threshold": {"m": 5, "nodes": [{"name": "in_0", "x": 0, "y": 0}, {"name": "in_1", "x": 0, "y": 1}, {"name": "in_2", "x": 0, "y": 2}, {"name": "in_3", "x": 0, "y": 3}, {"name": "mid_0", "x": 1, "y": 0}, {"name": "mid_1", "x": 1, "y": 1}, {"name": "mid_2", "x": 1, "y": 2}, {"name": "mid_3", "x": 1, "y": 3}, {"name": "mid_4", "x": 1, "y": 4}, {"name": "out_0", "x": 2, "y": 0}, {"name": "out_1", "x": 2, "y": 1}, {"name": "out_2", "x": 2, "y": 2}, {"name": "out_3", "x": 2, "y": 3}], "edges": [{"from": "in_0", "to": "mid_0"}, {"from": "in_0", "to": "mid_1"}, {"from": "in_0", "to": "mid_2"}, {"from": "in_0", "to": "mid_3"}, {"from": "in_0", "to": "mid_4"}, {"from": "in_1", "to": "mid_0"}, {"from": "in_1", "to": "mid_1"}, {"from": "in_1", "to": "mid_2"}, {"from": "in_1", "to": "mid_3"}, {"from": "in_1", "to": "mid_4"}, {"from": "in_2", "to": "mid_0"}, {"from": "in_2", "to": "mid_1"}, {"from": "in_2", "to": "mid_2"}, {"from": "in_2", "to": "mid_3"}, {"from": "in_2", "to": "mid_4"}, {"from": "in_3", "to": "mid_0"}, {"from": "in_3", "to": "mid_1"}, {"from": "in_3", "to": "mid_2"}, {"from": "in_3", "to": "mid_3"}, {"from": "in_3", "to": "mid_4"}, {"from": "mid_0", "to": "out_0"}, {"from": "mid_0", "to": "out_1"}, {"from": "mid_0", "to": "out_2"}, {"from": "mid_0", "to": "out_3"}, {"from": "mid_1", "to": "out_0"}, {"from": "mid_1", "to": "out_1"}, {"from": "mid_1", "to": "out_2"}, {"from": "mid_1", "to": "out_3"}, {"from": "mid_2", "to": "out_0"}, {"from": "mid_2", "to": "out_1"}, {"from": "mid_2", "to": "out_2"}, {"from": "mid_2", "to": "out_3"}, {"from": "mid_3", "to": "out_0"}, {"from": "mid_3", "to": "out_1"}, {"from": "mid_3", "to": "out_2"}, {"from": "mid_3", "to": "out_3"}, {"from": "mid_4", "to": "out_0"}, {"from": "mid_4", "to": "out_1"}, {"from": "mid_4", "to": "out_2"}, {"from": "mid_4", "to": "out_3"}], "steps": [{"source": 0, "destination": 1, "in_switch": 0, "out_switch": 0, "middle": 0}, {"source": 1, "destination": 9, "in_switch": 0, "out_switch": 3, "middle": 1}, {"source": 2, "destination": 8, "in_switch": 0, "out_switch": 2, "middle": 2}, {"source": 3, "destination": 5, "in_switch": 1, "out_switch": 1, "middle": 0}, {"source": 4, "destination": 10, "in_switch": 1, "out_switch": 3, "middle": 2}, {"source": 5, "destination": 2, "in_switch": 1, "out_switch": 0, "middle": 1}, {"source": 6, "destination": 3, "in_switch": 2, "out_switch": 1, "middle": 1}, {"source": 7, "destination": 7, "in_switch": 2, "out_switch": 2, "middle": 0}, {"source": 8, "destination": 4, "in_switch": 2, "out_switch": 1, "middle": 2}, {"source": 9, "destination": 0, "in_switch": 3, "out_switch": 0, "middle": 2}, {"source": 10, "destination": 11, "in_switch": 3, "out_switch": 3, "middle": 0}, {"source": 11, "destination": 6, "in_switch": 3, "out_switch": 2, "middle": 1}]}};
 
+const BENES_PERM_DATA = {"n": 8, "perm": [4, 3, 7, 6, 1, 0, 5, 2], "depths": 3, "positions": {"0": [0, 0, 0], "1": [1, 4, 4], "2": [2, 1, 2], "3": [3, 5, 6], "4": [4, 2, 1], "5": [5, 6, 7], "6": [6, 7, 5], "7": [7, 3, 3]}, "traces": {"0": ["top", "top"], "1": ["bottom", "top"], "2": ["top", "bottom"], "3": ["bottom", "bottom"], "4": ["top", "top"], "5": ["bottom", "bottom"], "6": ["bottom", "top"], "7": ["top", "bottom"]}};
 const NETWORK_META = {
   baseline: { title: "Baseline network (n=8)", stageGap: 220 },
   benes:    { title: "Benes network (n=8)", stageGap: 150 },
@@ -576,6 +605,113 @@ async function playBlockingDemo() {
 
 document.getElementById("blockingPlayBtn").addEventListener("click", playBlockingDemo);
 resetBlockingViews();
+
+
+// ---- Benes: whole permutation, live ----
+
+const BUTTERFLY_COLORS = ["#5eb0ff", "#ff9f5e", "#6ee7a0", "#ff8fd6", "#c9a4ff", "#ffd76e", "#7fe0e0", "#ff8080"];
+
+function drawBenesPermutation() {
+  const svg = document.getElementById("svgBenesPerm");
+  const n = BENES_PERM_DATA.n;
+  const depths = BENES_PERM_DATA.depths;
+  const positions = BENES_PERM_DATA.positions;
+  const perm = BENES_PERM_DATA.perm;
+
+  const width = 800, height = 380;
+  const padX = 70, padY = 30;
+  const colX = (d) => padX + (d / (depths - 1)) * (width - 2 * padX);
+  const rowY = (rank) => padY + (rank / (n - 1)) * (height - 2 * padY);
+
+  svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  svg.innerHTML = "";
+
+  // group color: inputs sharing a final pair (rank//2) get the same color
+  function colorFor(x) {
+    const finalRank = positions[x][depths - 1];
+    return BUTTERFLY_COLORS[Math.floor(finalRank / 2) % BUTTERFLY_COLORS.length];
+  }
+
+  const pointsByInput = {};
+  for (let x = 0; x < n; x++) {
+    const pts = positions[x].map((rank, d) => ({ x: colX(d), y: rowY(rank) }));
+    pointsByInput[x] = pts;
+    const color = colorFor(x);
+
+    const poly = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+    poly.setAttribute("points", pts.map(p => `${p.x},${p.y}`).join(" "));
+    poly.setAttribute("class", "butterfly-line");
+    poly.setAttribute("stroke", color);
+    svg.appendChild(poly);
+  }
+
+  for (let x = 0; x < n; x++) {
+    const pts = pointsByInput[x];
+    pts.forEach((p) => {
+      const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      c.setAttribute("cx", p.x); c.setAttribute("cy", p.y);
+      c.setAttribute("r", 4);
+      c.setAttribute("class", "butterfly-vertex");
+      svg.appendChild(c);
+    });
+
+    const startLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    startLabel.setAttribute("x", pts[0].x - 10); startLabel.setAttribute("y", pts[0].y + 3);
+    startLabel.setAttribute("class", "butterfly-label"); startLabel.setAttribute("text-anchor", "end");
+    startLabel.textContent = "in " + x;
+    svg.appendChild(startLabel);
+
+    const endLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    endLabel.setAttribute("x", pts[pts.length - 1].x + 10); endLabel.setAttribute("y", pts[pts.length - 1].y + 3);
+    endLabel.setAttribute("class", "butterfly-label");
+    endLabel.textContent = "out " + perm[x];
+    svg.appendChild(endLabel);
+  }
+
+  return pointsByInput;
+}
+
+let benesPermPlaying = false;
+
+async function playBenesPermutation() {
+  if (benesPermPlaying) return;
+  benesPermPlaying = true;
+  const btn = document.getElementById("benesPlayBtn");
+  btn.disabled = true;
+
+  const svg = document.getElementById("svgBenesPerm");
+  const pointsByInput = drawBenesPermutation();
+  const n = BENES_PERM_DATA.n;
+
+  const dots = [];
+  for (let x = 0; x < n; x++) {
+    const pts = pointsByInput[x];
+    const finalRank = BENES_PERM_DATA.positions[x][BENES_PERM_DATA.depths - 1];
+    const color = BUTTERFLY_COLORS[Math.floor(finalRank / 2) % BUTTERFLY_COLORS.length];
+    const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    dot.setAttribute("r", 6);
+    dot.setAttribute("fill", color);
+    dot.setAttribute("class", "butterfly-dot");
+    dot.style.color = color;
+    dot.setAttribute("cx", pts[0].x);
+    dot.setAttribute("cy", pts[0].y);
+    svg.appendChild(dot);
+    dots.push({ dot, pts });
+  }
+
+  const segMs = 900;
+  const segments = pointsByInput[0].length - 1;
+
+  for (let seg = 0; seg < segments; seg++) {
+    await Promise.all(dots.map(({ dot, pts }) => tweenTraveler(dot, pts[seg], pts[seg + 1], segMs)));
+  }
+
+  btn.disabled = false;
+  benesPermPlaying = false;
+}
+
+document.getElementById("benesPlayBtn").addEventListener("click", playBenesPermutation);
+drawBenesPermutation();
 
 </script>
 </body>

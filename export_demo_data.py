@@ -82,6 +82,34 @@ def export_clos():
     return graph_to_json(graph, paths, labels)
 
 
+def export_benes_permutation():
+    from routing.benes_visual import trace_all_inputs
+
+    n = 8
+    perm = [4, 3, 7, 6, 1, 0, 5, 2]  # fixed example, so the demo is reproducible
+    traces = trace_all_inputs(perm)
+    max_depth = len(traces[0])
+
+    # order inputs at each depth by their trace prefix so far (top before
+    # bottom), so tracks visually regroup as the recursion goes deeper
+    columns = [list(range(n))]
+    for d in range(1, max_depth + 1):
+        def sort_key(x, d=d):
+            prefix = traces[x][:d]
+            return tuple(0 if c == "top" else 1 for c in prefix) + (x,)
+        columns.append(sorted(range(n), key=sort_key))
+
+    positions = {x: [columns[d].index(x) for d in range(max_depth + 1)] for x in range(n)}
+
+    return {
+        "n": n,
+        "perm": perm,
+        "depths": max_depth + 1,
+        "positions": positions,
+        "traces": traces,
+    }
+
+
 def export_xgft():
     h, m, w = 2, 2, 2
     graph = build_xgft_network(h, m, w)
@@ -104,6 +132,10 @@ if __name__ == "__main__":
         "clos": export_clos(),
         "xgft": export_xgft(),
     }
+    benes_permutation_data = export_benes_permutation()
+    with open("benes_permutation_data.json", "w") as f:
+        json.dump(benes_permutation_data, f)
+    print("saved benes_permutation_data.json")
     with open("demo_data.json", "w") as f:
         json.dump(data, f)
     print("saved demo_data.json")

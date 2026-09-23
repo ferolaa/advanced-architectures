@@ -83,11 +83,13 @@ Measure and plot Clos blocking behavior:
 python3 blocking_analysis.py
 ```
 
-See an animated, interactive demo (open `network_demo.html` in a
-browser after running the steps above, since it also shows the
-saved pictures):
-```
-python3 export_demo_data.py
-python3 export_blocking_demo.py
-```
-Then just open `network_demo.html` — no server needed.
+See an animated, interactive demo: just open `network_demo.html`
+in a browser — no server, no setup needed (its data is already
+built in). Run `python3 draw_networks.py`, `scaling_analysis.py`
+and `blocking_analysis.py` first if the pictures section further
+down the page looks empty.
+
+`export_demo_data.py` and `export_blocking_demo.py` are the
+scripts that produced `network_demo.html`'s built-in data in the
+first place — only run them (and re-embed their output) if you
+change a network's example settings and want the page updated.
