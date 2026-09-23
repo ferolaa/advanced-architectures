@@ -38,6 +38,34 @@ def measure_clos(sizes, n_per_switch=4, m=6):
     return {"total_inputs": total_inputs, "switches": switches, "wires": wires}
 
 
+def measure_clos_by_m(m_values, r=8, n=4):
+    """
+    Returns switch and wire counts for a fixed-size Clos network
+    (r input/output switches, n inputs each), as m (middle switch
+    count) varies. Shows the cost of adding redundant middle paths.
+    """
+    switches = []
+    wires = []
+    for m in m_values:
+        clos_net = build_clos_network(r, n, m)
+        switches.append(clos_net.number_of_nodes())
+        wires.append(clos_net.number_of_edges())
+    return {"m_values": m_values, "switches": switches, "wires": wires}
+
+
+def plot_clos_by_m(clos_by_m, filename):
+    plt.figure(figsize=(7, 5))
+    plt.plot(clos_by_m["m_values"], clos_by_m["switches"], marker="o", label="Total switches")
+    plt.plot(clos_by_m["m_values"], clos_by_m["wires"], marker="o", label="Total wires")
+    plt.xlabel("Middle switches (m)")
+    plt.ylabel("Count")
+    plt.title("Clos network cost vs middle switch count (fixed size)")
+    plt.legend()
+    plt.savefig(filename, bbox_inches="tight")
+    plt.close()
+    print(f"saved {filename}")
+
+
 def plot_baseline_and_benes(sizes, results, filename):
     plt.figure(figsize=(7, 5))
     plt.plot(sizes, results["baseline_switches"], marker="o", label="Baseline switches")
@@ -79,3 +107,9 @@ if __name__ == "__main__":
     for total, sw, wi in zip(clos_results["total_inputs"], clos_results["switches"], clos_results["wires"]):
         print(f"total inputs={total}: switches={sw}, wires={wi}")
     plot_clos(clos_results, "pictures/scaling_clos.png")
+
+    m_values = [2, 4, 6, 8, 10, 12, 16]
+    clos_by_m = measure_clos_by_m(m_values, r=8, n=4)
+    for m, sw, wi in zip(clos_by_m["m_values"], clos_by_m["switches"], clos_by_m["wires"]):
+        print(f"m={m}: switches={sw}, wires={wi}")
+    plot_clos_by_m(clos_by_m, "pictures/scaling_clos_by_m.png")

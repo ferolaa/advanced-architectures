@@ -71,6 +71,15 @@ log2(N) stages of a Baseline network. Both grow with N*log(N),
 not N*N, which is what makes these networks efficient for large
 numbers of processors.
 
+For the Clos network, the middle switch count m was also varied
+while keeping the number of inputs fixed (`pictures/scaling_clos_by_m.png`).
+More middle switches means more redundant paths (helpful for
+avoiding blocking), but the cost is not free: the number of wires
+grows much faster than the number of switches, since every middle
+switch added connects to all r input and all r output switches.
+This is the cost/redundancy trade-off behind Clos's non-blocking
+condition (m >= 2n - 1).
+
 ## What was left out
 
 To keep the project simple, blocking analysis (how likely a
