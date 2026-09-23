@@ -35,6 +35,8 @@ For each network, the project can:
 - `draw_networks.py` — draws and saves the four pictures
 - `scaling_analysis.py` — measures and plots how network size grows
 - `blocking_analysis.py` — measures and plots Clos blocking rate vs middle switch count
+- `export_demo_data.py` — exports real network data (built with the actual code above) for the page below
+- `network_demo.html` — an animated page: pick a network and a source/destination, watch the real routing code find the path
 
 ## How to run it
 
@@ -79,3 +81,11 @@ Measure and plot Clos blocking behavior:
 ```
 python3 blocking_analysis.py
 ```
+
+See an animated, interactive demo (open `network_demo.html` in a
+browser after running the steps above, since it also shows the
+saved pictures):
+```
+python3 export_demo_data.py
+```
+Then just open `network_demo.html` — no server needed.
