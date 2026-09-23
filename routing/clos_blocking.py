@@ -48,6 +48,44 @@ def try_route_permutation(r, n, m, perm):
     return blocked_count
 
 
+def trace_permutation(r, n, m, perm):
+    """
+    Same routing as try_route_permutation, but records every step
+    instead of just the total. Used to animate the process.
+    Returns a list of steps, one per call, each a dict with the
+    source, destination, input/output switch, and the middle switch
+    used (or None if that call was blocked).
+    """
+    input_busy = [set() for _ in range(r)]
+    output_busy = [set() for _ in range(r)]
+    steps = []
+
+    for source in range(r * n):
+        in_switch = source // n
+        destination = perm[source]
+        out_switch = destination // n
+
+        chosen = None
+        for mid in range(m):
+            if mid not in input_busy[in_switch] and mid not in output_busy[out_switch]:
+                chosen = mid
+                break
+
+        if chosen is not None:
+            input_busy[in_switch].add(chosen)
+            output_busy[out_switch].add(chosen)
+
+        steps.append({
+            "source": source,
+            "destination": destination,
+            "in_switch": in_switch,
+            "out_switch": out_switch,
+            "middle": chosen,
+        })
+
+    return steps
+
+
 def simulate_random_traffic(r, n, m, seed=None):
     """
     Builds one random permutation of the r*n inputs and routes it.
