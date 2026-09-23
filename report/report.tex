@@ -107,6 +107,16 @@ traffic patterns, so a busier or more clever routing strategy could
 likely do better. Blocking was only measured for Clos; the other
 three networks were not tested this way.
 
+\section{Interactive demo}
+All four networks, and their routing, can also be seen in a
+single self-contained web page (\texttt{network\_demo.html}). It
+animates a chosen path for Baseline, Beneš, Clos, and XGFT, shows
+the Looping Algorithm routing a full Beneš permutation at once, and
+plays a live side-by-side comparison of Clos with too few versus
+enough middle switches, so blocking can be watched happening. The
+page needs no setup: results from every check are shown directly
+on it.
+
 \section{Conclusions}
 This project built four common interconnection networks in Python,
 routed data through each one, and checked the results against
