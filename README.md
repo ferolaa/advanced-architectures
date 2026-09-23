@@ -16,6 +16,10 @@ Three network types are built and routed:
 - **Clos network** — a three-stage network (input, middle, output).
   Any input can reach any output through some middle switch.
 
+- **XGFT fat-tree** — a tree-shaped network with h levels. Higher
+  levels have more parallel switches ("fat"), giving more possible
+  paths near the top.
+
 For each network, the project can:
 1. Build it as a graph.
 2. Find a path (or a full routing) through it.
@@ -23,7 +27,7 @@ For each network, the project can:
 
 ## Project files
 
-- `networks/` — builds each network (`baseline.py`, `benes.py`, `clos.py`)
+- `networks/` — builds each network (`baseline.py`, `benes.py`, `clos.py`, `xgft.py`)
 - `routing/` — finds paths through each network
 - `tests/` — checks the routing against the built networks
 - `pictures/` — saved drawings of each network
@@ -44,6 +48,7 @@ Build and print a network:
 python3 networks/baseline.py
 python3 -m networks.benes
 python3 -m networks.clos
+python3 -m networks.xgft
 ```
 
 Run the routing checks:
@@ -51,6 +56,7 @@ Run the routing checks:
 python3 -m tests.check_baseline_routing
 python3 -m tests.check_benes_routing
 python3 -m tests.check_clos_routing
+python3 -m tests.check_xgft_routing
 ```
 
 Run the traffic demo:

@@ -11,6 +11,7 @@ import networkx as nx
 from networks.baseline import build_baseline_network
 from networks.benes import build_benes_network
 from networks.clos import build_clos_network
+from networks.xgft import build_xgft_network
 
 
 def draw_network(graph, title, filename):
@@ -50,3 +51,6 @@ if __name__ == "__main__":
 
     clos_net = build_clos_network(4, 3, 5)
     draw_network(clos_net, "Clos network (r=4, n=3, m=5)", "pictures/clos.png")
+
+    xgft_net = build_xgft_network(h=2, m=2, w=2)
+    draw_network(xgft_net, "XGFT fat-tree (h=2, m=2, w=2)", "pictures/xgft.png")
