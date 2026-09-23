@@ -198,7 +198,7 @@
 <body>
 <div class="wrap">
   <h1>Interconnection Networks Animated Demo</h1>
-  <p class="subtitle">Pick a network, pick a source and destination, and watch the real routing code find the path.</p>
+  <p class="subtitle">Pick a network. Pick a start and end. Watch the path.</p>
 
   <div class="tabs" id="tabs"></div>
 
@@ -218,32 +218,32 @@
 
   <h2 class="section-title">Clos blocking, live</h2>
   <div class="panel">
-    <p class="caption" style="margin-top:0;">The same 12 random calls sent through two Clos networks (r=4, n=3): one with only m=2 middle switches, one with m=5 (the proven non-blocking minimum, 2n-1). Watch what happens as the calls fill up.</p>
+    <p class="caption" style="margin-top:0;">Same 12 calls. Left has too few middle switches. Right has enough.</p>
     <div class="controls">
       <button id="blockingPlayBtn">Play</button>
     </div>
-    <div class="status" id="blockingLog">Press Play to send the calls, one at a time.</div>
+    <div class="status" id="blockingLog">Press Play.</div>
     <div class="blocking-grid">
       <div class="blocking-side">
-        <h3 id="smallLabel">m = 2</h3>
+        <h3 id="smallLabel">m = 2 (too few)</h3>
         <svg id="svgSmall" viewBox="0 0 800 400" preserveAspectRatio="xMidYMid meet"></svg>
-        <div class="blocking-count" id="smallCount">0 blocked so far</div>
+        <div class="blocking-count" id="smallCount">0 blocked</div>
       </div>
       <div class="blocking-side">
-        <h3 id="thresholdLabel">m = 5 (non-blocking threshold)</h3>
+        <h3 id="thresholdLabel">m = 5 (enough)</h3>
         <svg id="svgThreshold" viewBox="0 0 800 400" preserveAspectRatio="xMidYMid meet"></svg>
-        <div class="blocking-count" id="thresholdCount">0 blocked so far</div>
+        <div class="blocking-count" id="thresholdCount">0 blocked</div>
       </div>
     </div>
   </div>
 
-  <h2 class="section-title">Scaling &amp; blocking results</h2>
+  <h2 class="section-title">More results</h2>
   <div class="panel">
     <div class="gallery">
-      <figure><img src="pictures/scaling_all_topologies.png" alt="Switch count vs network size, all topologies"><figcaption>Switch count vs. network size, all four topologies</figcaption></figure>
-      <figure><img src="pictures/scaling_baseline_benes.png" alt="Baseline vs Benes switch count"><figcaption>Baseline vs. Benes switch count</figcaption></figure>
-      <figure><img src="pictures/scaling_clos_by_m.png" alt="Clos cost vs middle switch count"><figcaption>Clos cost vs. middle switch count (m)</figcaption></figure>
-      <figure><img src="pictures/blocking_rate.png" alt="Clos blocking rate vs middle switch count"><figcaption>Clos blocking rate vs. m, non-blocking threshold marked</figcaption></figure>
+      <figure><img src="pictures/scaling_all_topologies.png" alt="Switch count vs network size, all topologies"><figcaption>Size vs. switches, all four</figcaption></figure>
+      <figure><img src="pictures/scaling_baseline_benes.png" alt="Baseline vs Benes switch count"><figcaption>Baseline vs. Benes</figcaption></figure>
+      <figure><img src="pictures/scaling_clos_by_m.png" alt="Clos cost vs middle switch count"><figcaption>Clos cost vs. m</figcaption></figure>
+      <figure><img src="pictures/blocking_rate.png" alt="Clos blocking rate vs middle switch count"><figcaption>Blocking rate vs. m</figcaption></figure>
     </div>
   </div>
 </div>
@@ -287,7 +287,7 @@ function switchNetwork(key) {
   [...tabsEl.children].forEach((el) => el.classList.toggle("active", el.dataset.key === key));
   populateSelectors();
   drawNetwork();
-  statusLine.textContent = "Pick a source and destination, then press Animate.";
+  statusLine.textContent = "Pick a start and end, then press Animate.";
   statusLine.classList.remove("done");
   caption.textContent = "";
 }
@@ -381,7 +381,7 @@ async function animatePath() {
   const path = net.paths[key];
 
   if (!path) {
-    statusLine.textContent = "No path available for that pair (try a different source/destination).";
+    statusLine.textContent = "No path for that pair. Try another.";
     statusLine.classList.remove("done");
     return;
   }
@@ -389,7 +389,7 @@ async function animatePath() {
   animating = true;
   animateBtn.disabled = true;
   statusLine.classList.remove("done");
-  statusLine.textContent = "Routing " + net.labels[sourceSelect.value] + " -> " + net.labels[destSelect.value] + " ...";
+  statusLine.textContent = net.labels[sourceSelect.value] + " -> " + net.labels[destSelect.value];
   caption.textContent = path.join("  ->  ");
 
   // reset styling
@@ -433,7 +433,7 @@ async function animatePath() {
     }
   }
 
-  statusLine.textContent = "Done, " + path.length + " switches visited.";
+  statusLine.textContent = "Done.";
   statusLine.classList.add("done");
   animating = false;
   animateBtn.disabled = false;
@@ -526,8 +526,8 @@ let smallView = null, thresholdView = null;
 function resetBlockingViews() {
   smallView = renderBlockingNetwork(document.getElementById("svgSmall"), BLOCKING_DATA.small);
   thresholdView = renderBlockingNetwork(document.getElementById("svgThreshold"), BLOCKING_DATA.threshold);
-  document.getElementById("smallCount").textContent = "0 blocked so far";
-  document.getElementById("thresholdCount").textContent = "0 blocked so far";
+  document.getElementById("smallCount").textContent = "0 blocked";
+  document.getElementById("thresholdCount").textContent = "0 blocked";
   document.getElementById("smallCount").classList.remove("has-blocks");
   document.getElementById("thresholdCount").classList.remove("has-blocks");
 }
@@ -557,19 +557,19 @@ async function playBlockingDemo() {
 
     if (sBlocked) { smallBlocked++; smallCountEl.classList.add("has-blocks"); }
     if (tBlocked) { thresholdBlocked++; thresholdCountEl.classList.add("has-blocks"); }
-    smallCountEl.textContent = smallBlocked + " blocked so far";
-    thresholdCountEl.textContent = thresholdBlocked + " blocked so far";
+    smallCountEl.textContent = smallBlocked + " blocked";
+    thresholdCountEl.textContent = thresholdBlocked + " blocked";
 
     let note = "";
-    if (sBlocked && tBlocked) note = "  (blocked on both sides)";
-    else if (sBlocked) note = "  (blocked on the m=2 side)";
-    else if (tBlocked) note = "  (blocked on the m=5 side)";
-    logEl.textContent = `Call ${i + 1} of ${smallSteps.length}: in_${sStep.in_switch} -> out_${sStep.out_switch}${note}`;
+    if (sBlocked && tBlocked) note = " (blocked)";
+    else if (sBlocked) note = " (blocked on left)";
+    else if (tBlocked) note = " (blocked on right)";
+    logEl.textContent = `in_${sStep.in_switch} -> out_${sStep.out_switch}${note}`;
 
     await sleep(750);
   }
 
-  logEl.textContent = `Done. m=2 blocked ${smallBlocked} of ${smallSteps.length} calls; m=5 blocked ${thresholdBlocked}.`;
+  logEl.textContent = "Done.";
   btn.disabled = false;
   blockingPlaying = false;
 }
