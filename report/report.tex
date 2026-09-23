@@ -16,7 +16,7 @@
 \author{Ferola \\
   Sapienza University of Rome \\
   Advanced Architectures \\
-  {\tt email@domain} \\}
+  {\tt hima.2060001@studenti.uniroma1.it} \\}
 
 \date{}
 
@@ -36,13 +36,6 @@ An interconnection network connects many processors (or switches)
 together inside a parallel computer. This project studies four
 kinds of such networks and shows, in code, how data moves through
 each one from an input to an output.
-
-\subsection{Examples}
-For a Baseline network, sending data from input 2 to output 6
-follows a path such as \texttt{s0\_1 -> s1\_3 -> s2\_2}, one switch
-per stage. For a Clos network, a call from input 5 to output 8
-might use the path \texttt{in\_1 -> mid\_3 -> out\_2}, picking one
-middle switch out of several possible ones.
 
 \subsection{Real-world applications}
 These networks are used to connect processors, memory, and servers
@@ -107,16 +100,6 @@ traffic patterns, so a busier or more clever routing strategy could
 likely do better. Blocking was only measured for Clos; the other
 three networks were not tested this way.
 
-\section{Interactive demo}
-All four networks, and their routing, can also be seen in a
-single self-contained web page (\texttt{network\_demo.html}). It
-animates a chosen path for Baseline, Beneš, Clos, and XGFT, shows
-the Looping Algorithm routing a full Beneš permutation at once, and
-plays a live side-by-side comparison of Clos with too few versus
-enough middle switches, so blocking can be watched happening. The
-page needs no setup: results from every check are shown directly
-on it.
-
 \section{Conclusions}
 This project built four common interconnection networks in Python,
 routed data through each one, and checked the results against
@@ -126,9 +109,6 @@ what the theory predicts. Future work could add blocking analysis
 for the other networks, smarter routing strategies, or connect
 these networks to an actual workload, such as an arithmetic unit,
 to see how the choice of network affects real performance.
-
-\minisection{Contributions} Single-author project: Ferola did all
-the design, implementation, and testing.
 
 \bibliographystyle{plain}
 \bibliography{refs}
