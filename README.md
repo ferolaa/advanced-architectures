@@ -5,7 +5,7 @@ used to connect many processors together in a parallel computer.
 
 ## What it does
 
-Three network types are built and routed:
+Four network types are built and routed:
 
 - **Baseline network** — connects N inputs to N outputs through
   small 2x2 switches arranged in stages. Routing is done by
@@ -31,11 +31,10 @@ For each network, the project can:
 - `routing/` — finds paths through each network
 - `tests/` — checks the routing against the built networks
 - `pictures/` — saved drawings of each network
-- `run_demo.py` — sends some traffic through all three networks
-- `draw_networks.py` — draws and saves the three pictures
+- `run_demo.py` — sends some traffic through all four networks
+- `draw_networks.py` — draws and saves the four pictures
 - `scaling_analysis.py` — measures and plots how network size grows
 - `blocking_analysis.py` — measures and plots Clos blocking rate vs middle switch count
-- `REPORT.md` — short write-up of the theory and results
 
 ## How to run it
 
@@ -58,6 +57,7 @@ python3 -m tests.check_baseline_routing
 python3 -m tests.check_benes_routing
 python3 -m tests.check_clos_routing
 python3 -m tests.check_xgft_routing
+python3 -m tests.check_clos_blocking
 ```
 
 Run the traffic demo:

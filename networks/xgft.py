@@ -20,6 +20,8 @@ def build_xgft_network(h, m, w):
     if h < 1 or m < 2 or w < 1:
         raise ValueError("h must be at least 1, m at least 2, w at least 1")
 
+    # undirected on purpose: unlike the other three networks, fat-tree
+    # links carry traffic both up and down
     graph = nx.Graph()
 
     num_leaves = m ** h

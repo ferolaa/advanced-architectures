@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from routing.clos_blocking import simulate_random_traffic
 
 
-def measure_blocking_rate(r, n, m, num_trials=50):
+def measure_blocking_rate(r, n, m, num_trials=300):
     """Average fraction of calls blocked, across num_trials random traffic patterns."""
     total_calls = r * n
     total_blocked = 0
@@ -22,7 +22,7 @@ def measure_blocking_rate(r, n, m, num_trials=50):
     return total_blocked / (total_calls * num_trials)
 
 
-def measure_blocking_by_m(r, n, m_values, num_trials=50):
+def measure_blocking_by_m(r, n, m_values, num_trials=300):
     """Blocking rate for each m in m_values."""
     rates = []
     for m in m_values:
