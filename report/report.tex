@@ -1,0 +1,125 @@
+\documentclass[11pt]{article}
+\usepackage{acl2015}
+\usepackage{times}
+\usepackage{url}
+\usepackage{latexsym}
+\usepackage{natbib}
+\usepackage{color}
+\definecolor{citecolor}{RGB}{34,139,34}
+\usepackage[pagebackref=true,breaklinks=true,letterpaper=true,citecolor=citecolor,colorlinks,bookmarks=false]{hyperref}
+\usepackage[capitalise]{cleveref}
+\usepackage[labelfont={bf,small},font=small]{caption}
+\newcommand{\minisection}[1]{\noindent{\textbf{#1.}}}
+
+\title{Simulating Multi-Stage Interconnection Networks in Python}
+
+\author{Ferola \\
+  Sapienza University of Rome \\
+  Advanced Architectures \\
+  {\tt email@domain} \\}
+
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This project builds and tests four interconnection networks used
+in parallel computers: Baseline, Beneš, Clos, and XGFT. Each
+network is built in Python, given a routing method, and checked
+for correctness. The Clos network is also tested for blocking, and
+all four are compared by size and cost.
+\end{abstract}
+
+\section{Task description}
+An interconnection network connects many processors (or switches)
+together inside a parallel computer. This project studies four
+kinds of such networks and shows, in code, how data moves through
+each one from an input to an output.
+
+\subsection{Examples}
+For a Baseline network, sending data from input 2 to output 6
+follows a path such as \texttt{s0\_1 -> s1\_3 -> s2\_2}, one switch
+per stage. For a Clos network, a call from input 5 to output 8
+might use the path \texttt{in\_1 -> mid\_3 -> out\_2}, picking one
+middle switch out of several possible ones.
+
+\subsection{Real-world applications}
+These networks are used to connect processors, memory, and servers
+in supercomputers and data centers, where many devices need fast,
+reliable paths to each other at once.
+
+\section{Related work}
+The Clos network was introduced by \citet{clos1953} as a way to
+build large switching networks from small switches, with a proven
+condition for avoiding blocking. The Beneš network, described by
+\citet{benes1965}, showed that the same idea could route any full
+permutation with no clashes. Fat-tree networks, including the
+generalized form (XGFT) built here, are a common choice in today's
+data center networks.
+
+\section{Tools and methods}
+The project is written in Python, using the \texttt{networkx}
+library to build and check each network as a graph, and
+\texttt{matplotlib} to draw pictures of them. No external dataset
+is needed: each network is generated directly by code, with a few
+example sizes used throughout (for example, Baseline and Beneš
+with 8 inputs; Clos with 4 input switches, 3 inputs each, and 5
+middle switches; XGFT with height 2).
+
+\section{Evaluation approach}
+In the literature, these networks are usually judged by: how many
+switches and wires they need for a given size, how they are
+routed, and whether they can get blocked (unable to find a free
+path) under load. This project follows the same three measures.
+
+\section{Experiments}
+For each network, every possible input-output path was checked
+against the actual wires built, to confirm the routing code is
+correct. For Beneš, this was done using 60 random full
+permutations. For Clos, correctness was also checked for the
+non-blocking condition directly: with $m \geq 2n-1$ middle
+switches, no random traffic pattern caused any blocked call, across
+many trials.
+
+Switch and wire counts were also measured as network size grows,
+and, for Clos, as the number of middle switches changes.
+
+\subsection{Results}
+Beneš needs close to twice as many switches as Baseline for the
+same size, matching the theory (Beneš has $2\log_2 N - 1$ stages,
+Baseline has $\log_2 N$). Both grow with $N \log N$, not $N^2$,
+which is why these networks scale well.
+
+For Clos, blocking rate drops sharply as the number of middle
+switches increases, reaching zero once $m \geq 2n - 1$, exactly as
+predicted by the non-blocking theorem. Below that point, blocking
+still happens sometimes, but less often than the worst-case
+guarantee would suggest, since random traffic is unlikely to hit
+the exact worst case.
+
+\subsection{Discussion}
+The routing methods used here are simple: Baseline and XGFT use
+direct rules based on the destination address, Clos always tries
+middle switches in a fixed order, and Beneš uses the Looping
+Algorithm only for full permutations. None of these adapt to
+traffic patterns, so a busier or more clever routing strategy could
+likely do better. Blocking was only measured for Clos; the other
+three networks were not tested this way.
+
+\section{Conclusions}
+This project built four common interconnection networks in Python,
+routed data through each one, and checked the results against
+known theory. All four networks and their routing methods worked
+correctly, and the results (switch counts, blocking rates) matched
+what the theory predicts. Future work could add blocking analysis
+for the other networks, smarter routing strategies, or connect
+these networks to an actual workload, such as an arithmetic unit,
+to see how the choice of network affects real performance.
+
+\minisection{Contributions} Single-author project: Ferola did all
+the design, implementation, and testing.
+
+\bibliographystyle{plain}
+\bibliography{refs}
+\end{document}
