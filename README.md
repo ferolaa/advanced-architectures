@@ -34,6 +34,7 @@ For each network, the project can:
 - `run_demo.py` — sends some traffic through all three networks
 - `draw_networks.py` — draws and saves the three pictures
 - `scaling_analysis.py` — measures and plots how network size grows
+- `blocking_analysis.py` — measures and plots Clos blocking rate vs middle switch count
 - `REPORT.md` — short write-up of the theory and results
 
 ## How to run it
@@ -72,4 +73,9 @@ python3 draw_networks.py
 Measure and plot how network size grows:
 ```
 python3 scaling_analysis.py
+```
+
+Measure and plot Clos blocking behavior:
+```
+python3 blocking_analysis.py
 ```

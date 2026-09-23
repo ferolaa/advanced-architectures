@@ -97,6 +97,25 @@ general rule for every Clos network — but it does show why Clos
 networks are popular in real data centers, where the number of
 switches (and their cost) matters a lot.
 
+## Blocking analysis
+
+Clos's theorem says a network with m >= 2n - 1 middle switches can
+always route any traffic with no blocking, no matter how the calls
+are arranged. This was tested directly (`blocking_analysis.py`,
+plot in `pictures/blocking_rate.png`): many random traffic patterns
+were generated for a range of m values, and the fraction of blocked
+calls was measured.
+
+Below the threshold, blocking happens often, and gets rarer as m
+grows. For r=8, n=5, the threshold is m = 2*5 - 1 = 9. In the
+random trials, the blocking rate actually reached zero a bit
+earlier (around m=6-7), not exactly at m=9. This is not a mistake:
+the m >= 2n - 1 guarantee holds for the *worst possible* traffic
+pattern, which is unlikely to come up by chance in random tests.
+Random traffic tends to avoid the worst case, so it can look
+non-blocking earlier — but only m >= 2n - 1 guarantees it always,
+for every possible pattern.
+
 ## What was left out
 
 To keep the project simple, blocking analysis (how likely a
