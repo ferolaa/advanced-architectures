@@ -245,6 +245,31 @@
     overflow-y: auto;
   }
   .check-item.open .check-output { display: block; }
+
+  .clash-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 700px) {
+    .clash-grid { grid-template-columns: 1fr; }
+  }
+  .clash-side h3 {
+    text-align: center;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 0 0 8px;
+    color: var(--text);
+  }
+  .clash-count {
+    text-align: center;
+    font-size: 0.85rem;
+    margin-top: 6px;
+    color: var(--muted);
+  }
+  .clash-count.has-clash { color: #ff5a5a; }
+  .node-circle.clash-flash { fill: #ff5a5a; stroke: #ff5a5a; }
+  .edge-line.clash-flash { stroke: #ff5a5a; stroke-width: 4; }
 </style>
 </head>
 <body>
@@ -276,6 +301,28 @@
       <button id="benesPlayBtn">Play</button>
     </div>
     <svg id="svgBenesPerm" viewBox="0 0 800 380" preserveAspectRatio="xMidYMid meet"></svg>
+  </div>
+
+
+  <h2 class="section-title">Baseline vs Benes: same permutation</h2>
+  <div class="panel">
+    <p class="caption" style="margin-top:0;">Same 8 connections, sent through both. Baseline jams. Benes doesn't.</p>
+    <div class="controls">
+      <button id="clashPlayBtn">Play</button>
+    </div>
+    <div class="status" id="clashLog">Press Play.</div>
+    <div class="clash-grid">
+      <div class="clash-side">
+        <h3>Baseline</h3>
+        <svg id="svgBaselineClash" viewBox="0 0 800 400" preserveAspectRatio="xMidYMid meet"></svg>
+        <div class="clash-count" id="baselineClashCount">0 clashes</div>
+      </div>
+      <div class="clash-side">
+        <h3>Benes</h3>
+        <svg id="svgBenesClash" viewBox="0 0 800 380" preserveAspectRatio="xMidYMid meet"></svg>
+        <div class="clash-count" id="benesClashCount">0 clashes</div>
+      </div>
+    </div>
   </div>
 
   <h2 class="section-title">Clos blocking, live</h2>
@@ -787,6 +834,216 @@ function renderCheckList() {
 }
 
 renderCheckList();
+
+
+// ---- Baseline vs Benes: same permutation ----
+
+const CLASH_PERM = BENES_PERM_DATA.perm;
+
+function baselinePathsForPerm(perm) {
+  const net = DATA.baseline;
+  const paths = {};
+  for (let i = 0; i < perm.length; i++) {
+    paths[i] = net.paths[i + "->" + perm[i]];
+  }
+  return paths;
+}
+
+function findBaselineClashes(paths) {
+  const edgeUsers = {};
+  Object.entries(paths).forEach(([i, path]) => {
+    for (let s = 0; s < path.length - 1; s++) {
+      const key = path[s] + "|" + path[s + 1];
+      if (!edgeUsers[key]) edgeUsers[key] = [];
+      edgeUsers[key].push(Number(i));
+    }
+  });
+  const clashes = [];
+  Object.entries(edgeUsers).forEach(([key, users]) => {
+    if (users.length > 1) {
+      const [from, to] = key.split("|");
+      clashes.push({ from, to, signals: users });
+    }
+  });
+  return clashes;
+}
+
+function renderStaticGraph(svgEl, net) {
+  const { positions, width, height } = layoutPositions(net);
+  svgEl.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  svgEl.innerHTML = "";
+  const edgeEls = {};
+  net.edges.forEach((e) => {
+    const a = positions[e.from], b = positions[e.to];
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("x1", a.x); line.setAttribute("y1", a.y);
+    line.setAttribute("x2", b.x); line.setAttribute("y2", b.y);
+    line.setAttribute("class", "edge-line");
+    svgEl.appendChild(line);
+    edgeEls[e.from + "|" + e.to] = line;
+  });
+  const nodeEls = {};
+  net.nodes.forEach((n) => {
+    const p = positions[n.name];
+    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    circle.setAttribute("cx", p.x); circle.setAttribute("cy", p.y);
+    circle.setAttribute("r", 12);
+    circle.setAttribute("class", "node-circle");
+    svgEl.appendChild(circle);
+    nodeEls[n.name] = circle;
+    const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    label.setAttribute("x", p.x); label.setAttribute("y", p.y - 18);
+    label.setAttribute("class", "node-label");
+    label.textContent = n.name;
+    svgEl.appendChild(label);
+  });
+  return { positions, nodeEls, edgeEls };
+}
+
+function drawBenesButterfly(svgEl) {
+  const n = BENES_PERM_DATA.n;
+  const depths = BENES_PERM_DATA.depths;
+  const positions = BENES_PERM_DATA.positions;
+  const perm = BENES_PERM_DATA.perm;
+  const width = 800, height = 380;
+  const padX = 70, padY = 30;
+  const colX = (d) => padX + (d / (depths - 1)) * (width - 2 * padX);
+  const rowY = (rank) => padY + (rank / (n - 1)) * (height - 2 * padY);
+
+  svgEl.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  svgEl.innerHTML = "";
+
+  function colorFor(x) {
+    const finalRank = positions[x][depths - 1];
+    return BUTTERFLY_COLORS[Math.floor(finalRank / 2) % BUTTERFLY_COLORS.length];
+  }
+
+  const pointsByInput = {};
+  for (let x = 0; x < n; x++) {
+    const pts = positions[x].map((rank, d) => ({ x: colX(d), y: rowY(rank) }));
+    pointsByInput[x] = pts;
+    const poly = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+    poly.setAttribute("points", pts.map(p => `${p.x},${p.y}`).join(" "));
+    poly.setAttribute("class", "butterfly-line");
+    poly.setAttribute("stroke", colorFor(x));
+    svgEl.appendChild(poly);
+  }
+  for (let x = 0; x < n; x++) {
+    pointsByInput[x].forEach((p) => {
+      const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      c.setAttribute("cx", p.x); c.setAttribute("cy", p.y);
+      c.setAttribute("r", 4);
+      c.setAttribute("class", "butterfly-vertex");
+      svgEl.appendChild(c);
+    });
+  }
+  return pointsByInput;
+}
+
+let clashPlaying = false;
+
+async function playClashDemo() {
+  if (clashPlaying) return;
+  clashPlaying = true;
+  const btn = document.getElementById("clashPlayBtn");
+  btn.disabled = true;
+  const logEl = document.getElementById("clashLog");
+  const baselineCountEl = document.getElementById("baselineClashCount");
+  const benesCountEl = document.getElementById("benesClashCount");
+
+  const baselinePaths = baselinePathsForPerm(CLASH_PERM);
+  const clashes = findBaselineClashes(baselinePaths);
+  const clashedEdges = new Set(clashes.map(c => c.from + "|" + c.to));
+
+  const baselineView = renderStaticGraph(document.getElementById("svgBaselineClash"), DATA.baseline);
+  const benesPoints = drawBenesButterfly(document.getElementById("svgBenesClash"));
+
+  baselineCountEl.textContent = "0 clashes";
+  benesCountEl.textContent = "0 clashes";
+  baselineCountEl.classList.remove("has-clash");
+
+  // baseline dots
+  const baselineDots = [];
+  for (let i = 0; i < 8; i++) {
+    const path = baselinePaths[i];
+    const startPos = baselineView.positions[path[0]];
+    const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    dot.setAttribute("r", 6);
+    dot.setAttribute("class", "traveler");
+    dot.setAttribute("cx", startPos.x);
+    dot.setAttribute("cy", startPos.y);
+    document.getElementById("svgBaselineClash").appendChild(dot);
+    baselineDots.push({ dot, path });
+  }
+
+  // benes dots
+  const benesDots = [];
+  for (let x = 0; x < 8; x++) {
+    const pts = benesPoints[x];
+    const finalRank = BENES_PERM_DATA.positions[x][BENES_PERM_DATA.depths - 1];
+    const color = BUTTERFLY_COLORS[Math.floor(finalRank / 2) % BUTTERFLY_COLORS.length];
+    const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    dot.setAttribute("r", 6);
+    dot.setAttribute("fill", color);
+    dot.setAttribute("class", "butterfly-dot");
+    dot.style.color = color;
+    dot.setAttribute("cx", pts[0].x);
+    dot.setAttribute("cy", pts[0].y);
+    document.getElementById("svgBenesClash").appendChild(dot);
+    benesDots.push({ dot, pts });
+  }
+
+  const segMs = 900;
+  const steps = 2; // both baseline (3 switches) and benes (3 columns) have 2 transitions
+
+  let baselineClashCount = 0;
+
+  for (let seg = 0; seg < steps; seg++) {
+    const moves = [];
+    baselineDots.forEach(({ dot, path }) => {
+      moves.push(tweenTraveler(dot, baselineView.positions[path[seg]], baselineView.positions[path[seg + 1]], segMs));
+    });
+    benesDots.forEach(({ dot, pts }) => {
+      moves.push(tweenTraveler(dot, pts[seg], pts[seg + 1], segMs));
+    });
+    await Promise.all(moves);
+
+    // after this step, flag any baseline edge used in this step that is a known clash
+    let newClashesThisStep = 0;
+    baselinePaths && Object.values(baselinePaths).forEach((path) => {
+      const key = path[seg] + "|" + path[seg + 1];
+      if (clashedEdges.has(key)) {
+        const el = baselineView.edgeEls[key];
+        if (el && !el.classList.contains("clash-flash")) {
+          el.classList.add("clash-flash");
+          baselineView.nodeEls[path[seg]] && baselineView.nodeEls[path[seg]].classList.add("clash-flash");
+          baselineView.nodeEls[path[seg + 1]] && baselineView.nodeEls[path[seg + 1]].classList.add("clash-flash");
+          newClashesThisStep++;
+        }
+      }
+    });
+    if (newClashesThisStep > 0) {
+      baselineClashCount += newClashesThisStep;
+      baselineCountEl.textContent = baselineClashCount + " clash" + (baselineClashCount === 1 ? "" : "es");
+      baselineCountEl.classList.add("has-clash");
+      logEl.textContent = "Baseline: two signals just tried to use the same wire.";
+    }
+  }
+
+  if (baselineClashCount === 0) {
+    logEl.textContent = "Done.";
+  } else {
+    logEl.textContent = `Done. Baseline had ${baselineClashCount} clash${baselineClashCount === 1 ? "" : "es"}. Benes had 0.`;
+  }
+  benesCountEl.textContent = "0 clashes";
+
+  btn.disabled = false;
+  clashPlaying = false;
+}
+
+document.getElementById("clashPlayBtn").addEventListener("click", playClashDemo);
+renderStaticGraph(document.getElementById("svgBaselineClash"), DATA.baseline);
+drawBenesButterfly(document.getElementById("svgBenesClash"));
 
 </script>
 </body>
